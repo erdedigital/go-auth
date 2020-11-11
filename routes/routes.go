@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/erdedigital/go-users/auth"
+
 	"github.com/gin-gonic/gin"
 )
 

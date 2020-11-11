@@ -4,37 +4,28 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/erdedigital/go-users/auth/model"
+	"github.com/erdedigital/go-users/auth/service"
 	"github.com/erdedigital/go-users/config"
 	"github.com/gin-gonic/gin"
 )
 
-func CreateUser(p *ModuleUser, s AuthService) error {
-	err := s.ServiceSave(p)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
 func Register(c *gin.Context) {
-	user := &ModuleUser{}
-	if err := c.ShouldBindJSON(&user); err != nil {
+	auth := &model.Auth{}
+	if err := c.ShouldBindJSON(&auth); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"msg":  fmt.Sprintf("Please make sure payload. [%s]", err),
 			"data": nil,
 		})
-		return
 	}
-
 	db, err := config.PostgresDB()
 	if err != nil {
-		fmt.Println("[Error]", err)
-
+		fmt.Println("[Error]", err.Error())
 	}
-	params := NewModuleUser()
-	params.Email = user.Email
-	authDbUser := NewAuthService(db)
-	err = CreateUser(user, authDbUser)
+	params := model.NewAuth()
+	params.Email = auth.Email
+	configAuth := service.NewAuth(db)
+	err = CreateAuth(auth, configAuth)
 	if err != nil {
 		fmt.Println(err)
 	}
